@@ -61,7 +61,7 @@ def main(cfg: DictConfig):
         **OmegaConf.to_container(cfg.trainer, resolve=True),
         callbacks=[
             ModelCheckpoint(
-                monitor="val/classification_loss_last",
+                monitor="val/loss",
                 dirpath="checkpoints/",
                 filename=f"{experiment_id}_" + "{epoch}",
                 save_top_k=-1,
