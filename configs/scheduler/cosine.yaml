@@ -1,0 +1,5 @@
+steps_per_epoch: 1251
+peak_lr: 0.001
+min_lr: 0
+warmup_epochs: 20
+total_epochs: 300

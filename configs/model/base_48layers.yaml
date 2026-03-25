@@ -1,0 +1,8 @@
+num_classes: 1000
+input_dim: 1280
+dim: 256
+depth: 48
+d_state: 64
+d_conv: 4
+expand: 2
+residual_in_fp32: True

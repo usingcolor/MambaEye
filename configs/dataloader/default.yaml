@@ -1,0 +1,11 @@
+train:
+  batch_size: 64
+  num_workers: 4
+  shuffle: True
+  drop_last: True
+  # persistent_workers: True
+  # pin_memory: True
+val:
+  batch_size: 64
+  num_workers: 4
+  shuffle: False

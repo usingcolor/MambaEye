@@ -1,0 +1,18 @@
+train:
+  img_dir: "/path/to/imagenet/train"
+  patch_size: 16
+  move_embedding_dim: 256
+  min_canvas_size: 256
+  max_canvas_size: 1024
+  sequence_length: 1024
+  validate: False
+  padding_value: 0
+val:
+  img_dir: "/path/to/imagenet/val"
+  patch_size: 16
+  move_embedding_dim: 256
+  min_canvas_size: 512
+  max_canvas_size: 512
+  sequence_length: 4096
+  validate: True
+  padding_value: 0

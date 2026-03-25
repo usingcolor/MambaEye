@@ -1,0 +1,28 @@
+defaults:
+  - _self_
+  - model: base_48layers
+  - dataset: default
+  - dataloader: default
+  - optimizer: adamw
+  - scheduler: cosine
+  - trainer: default
+
+# Checkpoint & model selection
+ckpt_path: null
+model_name: null        # Model alias for auto-download (e.g., tiny, small, base, base-ft)
+hf_repo: null           # HuggingFace repo ID (used if model_name is not set)
+hf_checkpoint: null     # HuggingFace checkpoint filename
+
+# Eval options
+image_path: null
+resize_mode: "none"
+scan_pattern: "random"
+
+# Training options
+fine_tuning: false
+experiment_id: null
+
+# Weights & Biases (optional, falls back to CSV logger if not set)
+wandb:
+  entity: null
+  project: "MambaEye"
