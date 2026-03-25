@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Primary Meta Tags -->
+  <meta name="title"
+    content="MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing - Changho Choi, Minho Kim, Jinkyu Kim">
+  <meta name="description"
+    content="MambaEye is a novel, causal sequential visual encoder leveraging a pure Mamba2 backbone. It utilizes relative move embedding and a diffusion-inspired loss for translation invariance, enabling it to process arbitrary image resolutions and sequences efficiently.">
+  <meta name="keywords"
+    content="MambaEye, Mamba, Vision Encoder, Size-Agnostic, Sequential Processing, Causal, State Space Models, Computer Vision">
+  <meta name="author" content="Changho Choi, Minho Kim, Jinkyu Kim">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Korea University & MIT">
+  <meta property="og:title" content="MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing">
+  <meta property="og:description"
+    content="MambaEye is a novel, causal sequential visual encoder leveraging a pure Mamba2 backbone. It utilizes relative move embedding and a diffusion-inspired loss for translation invariance, enabling it to process arbitrary image resolutions and sequences efficiently.">
+  <meta property="og:url" content="https://usingcolor.github.io/MambaEye/">
+  <meta property="og:image" content="https://github.com/usingcolor/MambaEye/raw/main/assets/architecture.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt"
+    content="MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing - Research Preview">
+  <meta property="article:published_time" content="2025-11-25T00:00:00.000Z">
+  <meta property="article:author" content="Changho Choi">
+  <meta property="article:section" content="Research">
+  <meta property="article:tag" content="MambaEye">
+  <meta property="article:tag" content="Vision Encoder">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@usingcolor">
+  <meta name="twitter:creator" content="@usingcolor">
+  <meta name="twitter:title" content="MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing">
+  <meta name="twitter:description"
+    content="MambaEye is a novel, causal sequential visual encoder leveraging a pure Mamba2 backbone. It utilizes relative move embedding and a diffusion-inspired loss for translation invariance, enabling it to process arbitrary image resolutions and sequences efficiently.">
+  <meta name="twitter:image" content="https://github.com/usingcolor/MambaEye/raw/main/assets/architecture.png">
+  <meta name="twitter:image:alt"
+    content="MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing - Research Preview">
+
+  <!-- Academic/Research Specific -->
+  <meta name="citation_title" content="MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing">
+  <meta name="citation_author" content="Choi, Changho">
+  <meta name="citation_author" content="Kim, Minho">
+  <meta name="citation_author" content="Kim, Jinkyu">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_conference_title" content="CVPR 2026 Findings">
+  <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2511.19963.pdf">
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#2563eb">
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://documentcloud.adobe.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+
+  <title>MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing | CVPR 2026 Findings</title>
+
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link rel="apple-touch-icon" href="static/images/favicon.ico">
+
+  <!-- Critical CSS - Load synchronously -->
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <!-- Non-critical CSS - Load asynchronously -->
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style"
+    onload="this.onload=null;this.rel='stylesheet'">
+
+  <!-- Fallback for browsers that don't support preload -->
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+
+  <!-- Fonts - Optimized loading -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- MathJax for rendering LaTeX formulas -->
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Defer non-critical JavaScript -->
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <!-- Structured Data for Academic Papers -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    "headline": "MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing",
+    "description": "MambaEye is a novel, causal sequential visual encoder leveraging a pure Mamba2 backbone. It utilizes relative move embedding and a diffusion-inspired loss for translation invariance, enabling it to process arbitrary image resolutions and sequences efficiently.",
+    "author": [
+      {
+        "@type": "Person",
+        "name": "Changho Choi",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Korea University"
+        }
+      },
+      {
+        "@type": "Person",
+        "name": "Minho Kim",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "MIT"
+        }
+      },
+      {
+        "@type": "Person",
+        "name": "Jinkyu Kim",
+        "affiliation": {
+          "@type": "Organization",
+          "name": "Korea University"
+        }
+      }
+    ],
+    "datePublished": "2026-06-01",
+    "publisher": {
+      "@type": "Organization",
+      "name": "CVPR 2026 Findings"
+    },
+    "url": "https://usingcolor.github.io/MambaEye/",
+    "image": "https://github.com/usingcolor/MambaEye/raw/main/assets/architecture.png",
+    "keywords": ["MambaEye", "Mamba", "Vision Encoder", "Size-Agnostic", "Sequential Processing", "Causal", "State Space Models", "Computer Vision"],
+    "abstract": "Despite decades of progress, a truly input-size agnostic visual encoder—a fundamental characteristic of human vision—has remained elusive. We address this limitation by proposing MambaEye, a novel, causal sequential encoder that leverages the low complexity and causal-process based pure Mamba2 backbone. Unlike previous Mamba-based vision encoders that often employ bidirectional processing, our strictly unidirectional approach preserves the inherent causality of State Space Models, enabling the model to generate a prediction at any point in its input sequence. A core innovation is our use of relative move embedding, which encodes the spatial shift between consecutive patches, providing a strong inductive bias for translation invariance and making the model inherently adaptable to arbitrary image resolutions and scanning patterns. To achieve this, we introduce a novel diffusion-inspired loss function that provides dense, step-wise supervision, training the model to build confidence as it gathers more visual evidence. We demonstrate that MambaEye exhibits robust performance across a wide range of image resolutions, especially at higher resolutions such as 1536^2 on the ImageNet-1K classification task. This feat is achieved while maintaining linear time and memory complexity relative to the number of patches.",
+    "citation": "@inproceedings{mambaeye2026, title={MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing}, author={Changho Choi and Minho Kim and Jinkyu Kim}, booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Findings}, year={2026}, note={Accepted}}",
+    "isAccessibleForFree": true,
+    "license": "https://creativecommons.org/licenses/by/4.0/",
+    "mainEntity": {
+      "@type": "WebPage",
+      "@id": "https://usingcolor.github.io/MambaEye/"
+    },
+    "about": [
+      {
+        "@type": "Thing",
+        "name": "Computer Vision"
+      },
+      {
+        "@type": "Thing", 
+        "name": "State Space Models"
+      }
+    ]
+  }
+  </script>
+
+  <!-- Website/Organization Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Korea University & MIT",
+    "url": "https://usingcolor.github.io",
+    "logo": "https://usingcolor.github.io/MambaEye/static/images/favicon.ico",
+    "sameAs": [
+      "https://github.com/usingcolor"
+    ]
+  }
+  </script>
+</head>
+
+<body>
+
+
+  <!-- Scroll to Top Button -->
+  <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+    <i class="fas fa-chevron-up"></i>
+  </button>
+
+  <main id="main-content">
+    <section class="hero">
+      <div class="hero-body">
+        <div class="container is-max-desktop">
+          <div class="columns is-centered">
+            <div class="column has-text-centered">
+              <!-- Paper Title -->
+              <h1 class="title is-1 publication-title">MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential
+                Processing</h1>
+              <div class="is-size-5 publication-authors">
+                <span class="author-block">
+                  <a href="https://usingcolor.github.io/" target="_blank">Changho Choi</a><sup>1</sup>,</span>
+                <span class="author-block">
+                  <a href="https://scholar.google.com/citations?user=NU-Km1QAAAAJ&hl=en" target="_blank">Minho
+                    Kim</a><sup>2</sup>,</span>
+                <span class="author-block">
+                  <a href="https://visionai.korea.ac.kr/team/" target="_blank">Jinkyu Kim</a><sup>1&dagger;</sup>
+                </span>
+              </div>
+
+              <div class="is-size-5 publication-authors">
+                <span class="author-block"><sup>1</sup>Korea University, <sup>2</sup>MIT<br>CVPR 2026 Findings</span>
+                <span class="eql-cntrb"><small><br><sup>&dagger;</sup>Corresponding author</small></span>
+              </div>
+
+              <div class="column has-text-centered">
+                <div class="publication-links">
+                  <!-- arXiv Link -->
+                  <span class="link-block">
+                    <a href="https://arxiv.org/pdf/2511.19963.pdf" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                        <i class="fas fa-file-pdf"></i>
+                      </span>
+                      <span>Paper</span>
+                    </a>
+                  </span>
+
+                  <!-- GitHub Repository Link -->
+                  <span class="link-block">
+                    <a href="https://github.com/usingcolor/MambaEye" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                        <i class="fab fa-github"></i>
+                      </span>
+                      <span>Code</span>
+                    </a>
+                  </span>
+
+                  <!-- arXiv Abstract Link -->
+                  <span class="link-block">
+                    <a href="https://arxiv.org/abs/2511.19963" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                        <i class="ai ai-arxiv"></i>
+                      </span>
+                      <span>arXiv</span>
+                    </a>
+                  </span>
+
+                  <!-- HuggingFace Link -->
+                  <span class="link-block">
+                    <a href="https://huggingface.co/collections/usingcolor/mambaeye" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                        <img src="https://huggingface.co/front/assets/huggingface_logo.svg" alt="HF"
+                          style="width: 18px; height: 18px;">
+                      </span>
+                      <span>Models</span>
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- Teaser video-->
+    <section class="hero teaser">
+      <div class="container is-max-desktop">
+        <div class="hero-body">
+          <h2 class="subtitle has-text-centered">
+            <strong>TLDR;</strong> We redesigned vision encoder to handle any image resolution with any sequence
+            length.<br>
+
+          </h2>
+
+          <video poster="" id="tree" autoplay controls muted loop height="100%" preload="metadata">
+            <source src="../assets/onestep_animation.mp4" type="video/mp4">
+          </video>
+        </div>
+      </div>
+    </section>
+    <!-- End teaser video -->
+
+    <!-- Video carousel: Inference by Image Size -->
+    <section class="hero is-small">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="title is-3" style="text-align: center; margin-bottom: 30px;">Inference with Various Image
+            Resolutions</h2>
+          <div id="results-carousel-1" class="carousel results-carousel">
+            <div class="item item-video1">
+              <div class="columns is-centered is-vcentered" style="padding: 0 1rem;">
+                <div class="column is-one-third has-text-centered">
+                  <h3 class="title is-5" style="margin-bottom: 10px;">Input Image (500 &times; 333)</h3>
+                  <img src="static/videos/Inference_by_imagesize/dog.jpg" alt="Dog Input Image"
+                    style="border-radius: 8px; width: 100%; max-height: 70vh; object-fit: contain;">
+                </div>
+                <div class="column is-two-thirds has-text-centered">
+                  <h3 class="title is-5" style="margin-bottom: 10px;">Inference Process</h3>
+                  <video poster="" id="video1" controls muted loop preload="metadata"
+                    style="border-radius: 8px; width: 100%; max-height: 70vh; object-fit: contain;">
+                    <source src="static/videos/Inference_by_imagesize/dog.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </div>
+            <div class="item item-video3">
+              <div class="columns is-centered is-vcentered" style="padding: 0 1rem;">
+                <div class="column is-one-third has-text-centered">
+                  <h3 class="title is-5" style="margin-bottom: 10px;">Input Image (1024 &times; 1024)</h3>
+                  <img src="static/videos/Inference_by_imagesize/leo.jpg" alt="Leo Input Image"
+                    style="border-radius: 8px; width: 100%; max-height: 70vh; object-fit: contain;">
+                </div>
+                <div class="column is-two-thirds has-text-centered">
+                  <h3 class="title is-5" style="margin-bottom: 10px;">Inference Process</h3>
+                  <video poster="" id="video3" controls muted loop preload="metadata"
+                    style="border-radius: 8px; width: 100%; max-height: 70vh; object-fit: contain;">
+                    <source src="static/videos/Inference_by_imagesize/leo.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </div>
+            <div class="item item-video2">
+              <div class="columns is-centered is-vcentered" style="padding: 0 1rem;">
+                <div class="column is-one-third has-text-centered">
+                  <h3 class="title is-5" style="margin-bottom: 10px;">Input Image (1536 &times; 2752)</h3>
+                  <img src="static/videos/Inference_by_imagesize/green_mamba.png" alt="Green Mamba Input Image"
+                    style="border-radius: 8px; width: 100%; max-height: 70vh; object-fit: contain;">
+                </div>
+                <div class="column is-two-thirds has-text-centered">
+                  <h3 class="title is-5" style="margin-bottom: 10px;">Inference Process</h3>
+                  <video poster="" id="video2" controls muted loop preload="metadata"
+                    style="border-radius: 8px; width: 100%; max-height: 70vh; object-fit: contain;">
+                    <source src="static/videos/Inference_by_imagesize/green_mamba.mp4" type="video/mp4">
+                  </video>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End video carousel -->
+
+
+    <!-- Video carousel: Inference by Scanning Path -->
+    <section class="hero is-small is-light">
+      <div class="hero-body">
+        <div class="container">
+          <h2 class="title is-3" style="text-align: center; margin-bottom: 30px;">Inference by Scanning Paths
+          </h2>
+          <div id="results-carousel-2" class="carousel results-carousel">
+            <div class="item item-video4 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Column Raster</h3>
+              <video poster="" id="video4" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/column_raster.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video5 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Column Snake</h3>
+              <video poster="" id="video5" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/column_snake.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video6 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Diagonal</h3>
+              <video poster="" id="video6" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/diagonal.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video7 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Golden</h3>
+              <video poster="" id="video7" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/golden.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video8 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Hilbert</h3>
+              <video poster="" id="video8" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/hilbert.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video9 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Random Grid</h3>
+              <video poster="" id="video9" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/random_grid.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video10 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Row Raster</h3>
+              <video poster="" id="video10" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/row_raster.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video11 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Row Snake</h3>
+              <video poster="" id="video11" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/row_snake.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video12 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Spiral</h3>
+              <video poster="" id="video12" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_scanning_path/spiral.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="item item-video13 has-text-centered" style="padding: 1rem;">
+              <h3 class="title is-5" style="margin-bottom: 20px;">Random</h3>
+              <video poster="" id="video13" controls muted loop height="100%" style="border-radius: 8px;"
+                preload="metadata">
+                <source src="static/videos/Inference_by_imagesize/dog.mp4" type="video/mp4">
+              </video>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </section>
+    <!-- End video carousel -->
+
+    <!-- Paper abstract -->
+    <section class="section hero is-light">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Abstract</h2>
+            <div class="content has-text-justified">
+              <p>
+                Despite decades of progress, a truly input-size agnostic visual encoder—a fundamental characteristic of
+                human vision—has remained elusive. We address this limitation by proposing MambaEye, a novel, causal
+                sequential encoder that leverages the low complexity and causal-process based pure Mamba2 backbone.
+                Unlike previous Mamba-based vision encoders that often employ bidirectional processing, our strictly
+                unidirectional approach preserves the inherent causality of State Space Models, enabling the model to
+                generate a prediction at any point in its input sequence. A core innovation is our use of relative move
+                embedding, which encodes the spatial shift between consecutive patches, providing a strong inductive
+                bias for translation invariance and making the model inherently adaptable to arbitrary image resolutions
+                and scanning patterns. To achieve this, we introduce a novel diffusion-inspired loss function that
+                provides dense, step-wise supervision, training the model to build confidence as it gathers more visual
+                evidence. We demonstrate that MambaEye exhibits robust performance across a wide range of image
+                resolutions, especially at higher resolutions such as 1536<sup>2</sup> on the ImageNet-1K classification
+                task. This feat is achieved while maintaining linear time and memory complexity relative to the number
+                of patches.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End paper abstract -->
+
+    <!-- Model Architecture -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Model Architecture</h2>
+            <div class="content has-text-justified">
+              <p>
+                MambaEye processes a sequence of image patches through three components:
+                a <strong>Projection Head</strong> that concatenates each patch with a sinusoidal Move
+                Embedding encoding the relative spatial shift from the previous patch,
+                a causal <strong>Mamba2 Backbone</strong> of stacked SSM blocks, and
+                a <strong>Classification Head</strong> that produces logits at each step.
+              </p>
+              <p>Key features of the architecture include:</p>
+              <ul>
+                <li><strong>Flexible Image Understanding:</strong> Processes multi-resolution images and arbitrary
+                  aspect ratios, including partial images.</li>
+                <li><strong>Variable-Length Processing:</strong> Natively handles sequential inputs of varying lengths.
+                </li>
+                <li><strong>Efficient Scaling:</strong> Achieves linear memory and computational complexity (by number
+                  of patches) powered by Mamba2 layers. (Constant memory for inference.)</li>
+              </ul>
+            </div>
+
+            <img src="static/images/model_architecture.png" alt="MambaEye Model Architecture" width="80%">
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End Model Architecture -->
+
+    <!-- Diffusion-Inspired Loss -->
+    <section class="section is-light">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Diffusion-Inspired Loss Function</h2>
+            <div class="content has-text-justified">
+              <p>
+                We frame classification as iterative refinement: as the model sees more patches, its prediction should
+                evolve from a uniform prior to the ground-truth label. The target distribution at step \( t \) is
+                interpolated using the <i>information ratio</i> \( r_t \in [0, 1] \) — the fraction of image area
+                covered so far:
+              </p>
+              <p class="has-text-centered is-size-5">
+                \( \mathbf{p}_{\text{scheduled}}^{(t)} = (1 - r_t) \cdot \mathbf{p}_{\text{prior}} + r_t \cdot
+                \mathbf{p}_{\text{target}} \)
+              </p>
+              <p>
+                The total loss is the mean cross-entropy over the full sequence:
+              </p>
+              <p class="has-text-centered is-size-5">
+                \( \mathcal{L} = \frac{1}{T} \sum_{t=0}^{T-1} \text{CE}\left(\mathbf{p}_{\text{scheduled}}^{(t)},
+                \mathbf{y}_t\right) \)
+              </p>
+              <p>
+                This dense, step-wise supervision guides the model to calibrate confidence progressively and encourages
+                its hidden state to act as a compressed summary of all visual evidence gathered.
+              </p>
+            </div>
+            <div class="table-container">
+              <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+                <thead>
+                  <tr>
+                    <th colspan="5" style="text-align: center;">Table 4. Ablation study of the loss function on
+                      ImageNet-1K</th>
+                  </tr>
+                  <tr>
+                    <th>Loss Function</th>
+                    <th>224&sup2;</th>
+                    <th>512&sup2;</th>
+                    <th>1024&sup2;</th>
+                    <th>1536&sup2;</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Standard CE</td>
+                    <td>56.7</td>
+                    <td>61.9</td>
+                    <td>59.9</td>
+                    <td>53.6</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ours (Diffusion-inspired)</strong></td>
+                    <td><strong>61.1</strong></td>
+                    <td><strong>66.2</strong></td>
+                    <td><strong>63.3</strong></td>
+                    <td><strong>56.5</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End Diffusion-Inspired Loss -->
+
+    <!-- Ablations & Results -->
+    <section class="section">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Ablations & Results</h2>
+            <div class="content has-text-justified">
+              <p>
+                A key claim of MambaEye is its size-agnostic architecture. We evaluated pretrained models across a wide
+                range of image resolutions (224&sup2; to 1536&sup2;). As demonstrated below, our architecture scales
+                robustly with resolution even when using a naive random sampling policy. In high-resolution regimes
+                (1280&sup2; to 1536&sup2;), our fine-tuned variants surpass or close the gap with size-matched baselines
+                that rely on deterministic scanning patterns. MambaEye's unidirectional model is inherently adaptable to
+                arbitrary scanning patterns, outperforming traditional raster or zigzag scans.
+              </p>
+            </div>
+
+            <img src="static/images/size_ablation_comparison_11Mscale.png" alt="Size Ablation Comparison (11M scale)"
+              width="100%">
+            <img src="static/images/512_res_sequence_models_vs_sequence.png" alt="Sequence Models vs Sequence (512 res)"
+              width="100%">
+            <!-- <div class="columns is-centered">
+              <div class="column is-half">
+                <img src="static/images/size_ablation_comparison_11Mscale.png"
+                  alt="Size Ablation Comparison (11M scale)" width="100%">
+              </div>
+              <div class="column is-half">
+                <img src="static/images/512_res_sequence_models_vs_sequence.png"
+                  alt="Sequence Models vs Sequence (512 res)" width="100%">
+              </div>
+            </div> -->
+
+            <div class="table-container" style="margin-top: 30px; overflow-x: auto;">
+              <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth is-size-7">
+                <thead>
+                  <tr>
+                    <th colspan="11" style="text-align: center;">Table 3. Top-1 Accuracy (%) on ImageNet-1K at various
+                      resolutions (T = 4096). "FT" denotes models fine-tuned on T=2048 sequences.</th>
+                  </tr>
+                  <tr>
+                    <th>Model</th>
+                    <th>224&sup2;</th>
+                    <th>256&sup2;</th>
+                    <th>384&sup2;</th>
+                    <th>512&sup2;</th>
+                    <th>640&sup2;</th>
+                    <th>768&sup2;</th>
+                    <th>1024&sup2;</th>
+                    <th>1280&sup2;</th>
+                    <th>1408&sup2;</th>
+                    <th>1536&sup2;</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Tiny scale -->
+                  <tr>
+                    <td><strong>MambaEye-T</strong> (5.8M)</td>
+                    <td>61.1</td>
+                    <td>62.9</td>
+                    <td>65.8</td>
+                    <td>66.2</td>
+                    <td>66.2</td>
+                    <td>65.3</td>
+                    <td>63.3</td>
+                    <td>60.6</td>
+                    <td>58.8</td>
+                    <td>56.5</td>
+                  </tr>
+                  <tr>
+                    <td><strong>MambaEye-T (FT)</strong> (5.8M)</td>
+                    <td>62.1</td>
+                    <td>63.7</td>
+                    <td>66.7</td>
+                    <td>67.2</td>
+                    <td>67.1</td>
+                    <td>66.4</td>
+                    <td>64.4</td>
+                    <td><strong>61.6</strong></td>
+                    <td><strong>59.8</strong></td>
+                    <td><strong>57.4</strong></td>
+                  </tr>
+                  <tr style="border-top: 2px solid #888;">
+                    <td>MSVMamba (7M)</td>
+                    <td><strong>77.3</strong></td>
+                    <td>77.7</td>
+                    <td>77.4</td>
+                    <td>75.0</td>
+                    <td>71.7</td>
+                    <td>65.8</td>
+                    <td>48.0</td>
+                    <td>31.0</td>
+                    <td>23.8</td>
+                    <td>18.3</td>
+                  </tr>
+                  <tr>
+                    <td>ViM (7M)</td>
+                    <td>76.1</td>
+                    <td>76.3</td>
+                    <td>70.4</td>
+                    <td>67.4</td>
+                    <td>51.4</td>
+                    <td>30.6</td>
+                    <td>16.1</td>
+                    <td>7.2</td>
+                    <td>4.1</td>
+                    <td>1.8</td>
+                  </tr>
+                  <tr>
+                    <td>Efficient VMamba (6M)</td>
+                    <td>76.5</td>
+                    <td>76.9</td>
+                    <td>76.5</td>
+                    <td>73.8</td>
+                    <td>70.4</td>
+                    <td>65.8</td>
+                    <td>52.0</td>
+                    <td>36.2</td>
+                    <td>29.4</td>
+                    <td>24.1</td>
+                  </tr>
+                  <tr>
+                    <td>FractalMamba++ (7M)</td>
+                    <td><strong>77.3</strong></td>
+                    <td><strong>78.4</strong></td>
+                    <td><strong>79.5</strong></td>
+                    <td><strong>78.4</strong></td>
+                    <td><strong>76.4</strong></td>
+                    <td><strong>73.7</strong></td>
+                    <td><strong>66.5</strong></td>
+                    <td>55.2</td>
+                    <td>48.1</td>
+                    <td>42.5</td>
+                  </tr>
+
+                  <!-- Small scale -->
+                  <tr style="border-top: 4px double #555;">
+                    <td><strong>MambaEye-S</strong> (11M)</td>
+                    <td>69.5</td>
+                    <td>70.6</td>
+                    <td>72.4</td>
+                    <td>72.7</td>
+                    <td>72.7</td>
+                    <td>71.9</td>
+                    <td>70.5</td>
+                    <td>68.1</td>
+                    <td>66.1</td>
+                    <td>63.6</td>
+                  </tr>
+                  <tr>
+                    <td><strong>MambaEye-S (FT)</strong> (11M)</td>
+                    <td>69.8</td>
+                    <td>71.0</td>
+                    <td>72.7</td>
+                    <td>73.1</td>
+                    <td>73.1</td>
+                    <td>72.5</td>
+                    <td>71.2</td>
+                    <td><strong>69.0</strong></td>
+                    <td><strong>66.9</strong></td>
+                    <td><strong>64.8</strong></td>
+                  </tr>
+                  <tr style="border-top: 2px solid #888;">
+                    <td>MSVMamba (12M)</td>
+                    <td><strong>79.8</strong></td>
+                    <td>80.1</td>
+                    <td>80.0</td>
+                    <td>78.3</td>
+                    <td>75.8</td>
+                    <td>72.0</td>
+                    <td>59.4</td>
+                    <td>43.9</td>
+                    <td>36.5</td>
+                    <td>29.9</td>
+                  </tr>
+                  <tr>
+                    <td>Efficient VMamba (11M)</td>
+                    <td>78.7</td>
+                    <td>79.6</td>
+                    <td>79.5</td>
+                    <td>77.3</td>
+                    <td>75.2</td>
+                    <td>72.4</td>
+                    <td>64.2</td>
+                    <td>54.1</td>
+                    <td>42.6</td>
+                    <td>38.3</td>
+                  </tr>
+                  <tr>
+                    <td>FractalMamba++ (11M)</td>
+                    <td>79.5</td>
+                    <td><strong>80.6</strong></td>
+                    <td><strong>82.0</strong></td>
+                    <td><strong>81.3</strong></td>
+                    <td><strong>80.1</strong></td>
+                    <td><strong>78.3</strong></td>
+                    <td><strong>73.3</strong></td>
+                    <td>66.3</td>
+                    <td>61.7</td>
+                    <td>56.1</td>
+                  </tr>
+
+                  <!-- Base scale -->
+                  <tr style="border-top: 4px double #555;">
+                    <td><strong>MambaEye-B</strong> (21M)</td>
+                    <td>70.6</td>
+                    <td>71.7</td>
+                    <td>73.3</td>
+                    <td>73.5</td>
+                    <td>73.4</td>
+                    <td>72.9</td>
+                    <td>71.7</td>
+                    <td>69.4</td>
+                    <td>67.0</td>
+                    <td>64.3</td>
+                  </tr>
+                  <tr>
+                    <td><strong>MambaEye-B (FT)</strong> (21M)</td>
+                    <td>72.2</td>
+                    <td>73.2</td>
+                    <td>74.8</td>
+                    <td>75.0</td>
+                    <td>75.0</td>
+                    <td>74.6</td>
+                    <td>73.7</td>
+                    <td>71.5</td>
+                    <td>69.5</td>
+                    <td>66.7</td>
+                  </tr>
+                  <tr style="border-top: 2px solid #888;">
+                    <td>VMamba (31M)</td>
+                    <td>82.5</td>
+                    <td>82.5</td>
+                    <td>82.5</td>
+                    <td>81.1</td>
+                    <td>79.3</td>
+                    <td>76.1</td>
+                    <td>62.3</td>
+                    <td>50.2</td>
+                    <td>45.1</td>
+                    <td>40.9</td>
+                  </tr>
+                  <tr>
+                    <td>FractalMamba++ (30M)</td>
+                    <td><strong>83.0</strong></td>
+                    <td><strong>83.5</strong></td>
+                    <td><strong>84.1</strong></td>
+                    <td><strong>83.9</strong></td>
+                    <td><strong>83.0</strong></td>
+                    <td><strong>81.9</strong></td>
+                    <td><strong>78.8</strong></td>
+                    <td><strong>74.3</strong></td>
+                    <td><strong>71.3</strong></td>
+                    <td><strong>67.5</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End Ablations & Results -->
+
+    <!-- Limitations & Future Work -->
+    <section class="section is-light">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered has-text-centered">
+          <div class="column is-four-fifths">
+            <h2 class="title is-3">Limitations &amp; Future Work</h2>
+            <div class="content has-text-justified">
+              <p>
+                While MambaEye is promising, several limitations remain. Our training omits advanced augmentations
+                (e.g., CutMix, Mixup), and scaling to larger model sizes needs further study. Exploring compatibility
+                with more complex architectures could also yield improvements.
+              </p>
+              <p>
+                Key future directions include generalizing to longer sequences and higher-dimensional data (video, 3D
+                volumes) by extending the move embedding, and replacing random patch sampling with a learned, adaptive
+                scanning policy to bring the model's efficiency closer to human vision.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <!-- End Limitations & Future Work -->
+
+
+    <!--BibTex citation -->
+    <section class="section" id="BibTeX">
+      <div class="container is-max-desktop content">
+        <div class="bibtex-header">
+          <h2 class="title">BibTeX</h2>
+          <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+            <i class="fas fa-copy"></i>
+            <span class="copy-text">Copy</span>
+          </button>
+        </div>
+        <pre id="bibtex-code"><code>@inproceedings{mambaeye2026,
+  title={MambaEye: A Size-Agnostic Visual Encoder with Causal Sequential Processing},
+  author={Changho Choi and Minho Kim and Jinkyu Kim},
+  booktitle={Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Findings},
+  year={2026},
+  note={Accepted}
+}</code></pre>
+      </div>
+    </section>
+    <!--End BibTex citation -->
+
+
+    <footer class="footer">
+      <div class="container">
+        <div class="columns is-centered">
+          <div class="column is-8">
+            <div class="content">
+
+              <p>
+                This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template"
+                  target="_blank">Academic Project Page Template</a> which was adopted from the <a
+                  href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+                You are free to borrow the source code of this website, we just ask that you link back to this page in
+                the footer. <br> This website is licensed under a <a rel="license"
+                  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+                  Commons Attribution-ShareAlike 4.0 International License</a>.
+              </p>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+</body>
+
+</html>
