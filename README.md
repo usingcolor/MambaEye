@@ -22,8 +22,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 
-<video src="https://github.com/usingcolor/MambaEye/blob/main/assets/inference.mp4" controls autoplay muted playsinline></video>
-<video src="https://github.com/usingcolor/MambaEye/blob/main/assets/onestep_animation.mp4" controls autoplay muted playsinline></video>
+<video src="https://raw.githubusercontent.com/usingcolor/MambaEye/main/assets/inference.mp4" controls autoplay muted playsinline></video>
+<video src="https://raw.githubusercontent.com/usingcolor/MambaEye/main/assets/onestep_animation.mp4" controls autoplay muted playsinline></video>
 
 ## Overview
 
