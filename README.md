@@ -22,8 +22,8 @@
 [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
 
-<video src="https://raw.githubusercontent.com/usingcolor/MambaEye/main/assets/inference.mp4" controls autoplay muted playsinline></video>
-<video src="https://raw.githubusercontent.com/usingcolor/MambaEye/main/assets/onestep_animation.mp4" controls autoplay muted playsinline></video>
+<video src="https://usingcolor.github.io/MambaEye/static/videos/Inference_by_imagesize/dog.mp4" controls autoplay muted playsinline></video>
+<video src="https://usingcolor.github.io/MambaEye/static/videos/onestep_animation.mp4" controls autoplay muted playsinline></video>
 
 ## Overview
 
